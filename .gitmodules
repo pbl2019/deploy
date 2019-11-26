@@ -1,0 +1,9 @@
+[submodule "aworld-datagen"]
+	path = aworld-datagen
+	url = https://github.com/pbl2019/aworld-datagen.git
+[submodule "aworld-server"]
+	path = aworld-server
+	url = https://github.com/pbl2019/aworld-server.git
+[submodule "aworld-client"]
+	path = aworld-client
+	url = https://github.com/pbl2019/aworld-client.git

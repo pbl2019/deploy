@@ -1,0 +1,69 @@
+version: "2.3"
+
+# 同一ディレクトリ内に以下のリポジトリをcloneしてきてください
+# - pbl2019/aworld-datagen
+# - pbl2019/aworld-server
+# - pbl2019/aworld-client
+
+services:
+  datagen:
+    image: rust
+    container_name: aworld-datagen
+    volumes:
+      - ./aworld-datagen:/app
+    working_dir: /app
+    tty: true
+    command: cargo run --bin server --release
+    ports:
+      # - "34254:34254/udp"
+      - "34253:34253/udp"
+    networks:
+      - app-net
+  control:
+    image: rust
+    container_name: aworld-control
+    volumes:
+      - ./aworld-server:/app
+    working_dir: /app
+    tty: true
+    command: cargo run --release
+    ports:
+      # - "34255:34255/udp"
+      - "34254:34254/udp"
+    networks:
+      - app-net
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: aworld-client
+    runtime: nvidia
+    environment:
+      # - NVIDIA_VISIBLE_DEVICES=all
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./aworld-client:/app
+    working_dir: /app
+    tty: true
+    ports:
+      # - "34253:34253/udp"
+      - "34255:34255/udp"
+    networks:
+      - app-net
+  mysql:
+    image: mysql:5.7.27
+    container_name: aworld-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "ourworld"
+    restart: "always"
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
